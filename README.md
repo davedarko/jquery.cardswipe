@@ -69,59 +69,60 @@ Here's a sample page that handles the example format:
 
 		<script type="text/javascript">
 
-// Parses raw scan into name and ID number
-var companyCardParser = function (rawData) {
+		// Parses raw scan into name and ID number
+		var companyCardParser = function (rawData) {
 
-    // RegExp to extract the first and last name and ID number from the raw data
-    var pattern = new RegExp("%B([0-9]{16})\\^([A-Z ]+)\/([A-Z ]+)\\^0*([0-9]{2})([0-9]{2})[A-Z0-9]+\\?");
-    var match = pattern.exec(rawData);
-    
-    //amex - if pattern match fales, it will look for 15 digits instead for american express
-    if (!match) {
-        var pattern = new RegExp("%B([0-9]{15})\\^([A-Z ]+)\/([A-Z ]+)\\^0*([0-9]{2})([0-9]{2})[A-Z0-9]+\\?");
-        var match = pattern.exec(rawData);
-        if (!match) return null;
-    }
-    
-    var cardData = {
-        firstName: $.trim(match[3]),
-        lastName: $.trim(match[2]),
-        cardDateMonth: match[5],
-        cardDateYear: match[4],
-        cardNumber: match[1]
-    };
-    return cardData;
-};
+		    // RegExp to extract the first and last name and ID number from the raw data
+		    var pattern = new RegExp("%B([0-9]{16})\\^([A-Z ]+)\/([A-Z ]+)\\^0*([0-9]{2})([0-9]{2})[A-Z0-9]+\\?");
+		    var match = pattern.exec(rawData);
+		    
+		    //amex - if pattern match fales, it will look for 15 digits instead for american express
+		    if (!match) {
+		        var pattern = new RegExp("%B([0-9]{15})\\^([A-Z ]+)\/([A-Z ]+)\\^0*([0-9]{2})([0-9]{2})[A-Z0-9]+\\?");
+		        var match = pattern.exec(rawData);
+		        if (!match) return null;
+		    }
+		    
+		    var cardData = {
+		        firstName: $.trim(match[3]),
+		        lastName: $.trim(match[2]),
+		        cardDateMonth: match[5],
+		        cardDateYear: match[4],
+		        cardNumber: match[1]
+		    };
+		    return cardData;
+		};
 
-// Called on a good scan (company card recognized)
-var goodScan = function (cardData) {
-        try {
-            $("#card-number").val(cardData.cardNumber);
-            $("#card-holdername").val(cardData.firstName + " " + cardData.lastName);
-            $("#card-expiry-year").val("20"+cardData.cardDateYear);
-            $("#card-expiry-month").val( parseInt(cardData.cardDateMonth,10));    
-        } 
-        catch (err) {
-            console.log("input error.", err);
-        }
-    };
+		// Called on a good scan (company card recognized)
+		var goodScan = function (cardData) {
+	        try {
+	            $("#card-number").val(cardData.cardNumber);
+	            $("#card-holdername").val(cardData.firstName + " " + cardData.lastName);
+	            $("#card-expiry-year").val("20"+cardData.cardDateYear);
+	            $("#card-expiry-month").val( parseInt(cardData.cardDateMonth,10));    
+	        } 
+	        catch (err) {
+	            console.log("input error.", err);
+	        }
+	    };
 
-// Called on a bad scan (company card not recognized)
-var badScan = function() {
-    console.log("Bad Scan.");
-};
+		// Called on a bad scan (company card not recognized)
+		var badScan = function() {
+		    console.log("Bad Scan.");
+		};
 
-// Initialize the plugin.
-$.cardswipe({
-    parser: companyCardParser,
-    success: goodScan,
-    error: badScan
-});
+		// Initialize the plugin.
+		$.cardswipe({
+		    parser: companyCardParser,
+		    success: goodScan,
+		    error: badScan
+		});
 
-	</script>
+		</script>
 
-	<input id="card-number"><br />
-	<input id="card-holder-name"><br />
-	<input id="card-expiry-year"><br />
-	<input id="card-expiry-month"><br />
-
+		<input id="card-number"><br />
+		<input id="card-holder-name"><br />
+		<input id="card-expiry-year"><br />
+		<input id="card-expiry-month"><br />
+	</body>
+	</html>
