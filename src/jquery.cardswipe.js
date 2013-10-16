@@ -64,6 +64,7 @@
 					e.stopPropagation();
 					startTimer();
 				}
+				
 				else {
 					clearTimer();
 					scanbuffer = null;
@@ -89,6 +90,7 @@
 					state = DISCARD;
 					processScan();
 				}
+
 				break;
 
 			case DISCARD:

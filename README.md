@@ -1,3 +1,6 @@
+## Disclaimer
+This is basically a copy of https://github.com/CarlRaymond/jquery.cardswipe - I just changed some parts in the example.
+
 # What It Does
 This jQuery plugin is intended for use with a magnetic card scanner that simulates a keyboard.  It allows a
 web application to interface with the card scanner so that scanning a card will trigger a callback function
@@ -66,42 +69,59 @@ Here's a sample page that handles the example format:
 
 		<script type="text/javascript">
 
-		// Parses raw scan into name and ID number
-		var companyCardParser = function (rawData) {
+// Parses raw scan into name and ID number
+var companyCardParser = function (rawData) {
 
-			// RegExp to extract the first and last name and ID number from the raw data
-			var pattern = new RegExp("^%B654321[0-9]{10}\\^([A-Z ]+)\/([A-Z ]+)\\^0*([A-Z0-9])+\\?");
-			var match = pattern.exec(rawData);
-			if (!match)
-				return null;
+    // RegExp to extract the first and last name and ID number from the raw data
+    var pattern = new RegExp("%B([0-9]{16})\\^([A-Z ]+)\/([A-Z ]+)\\^0*([0-9]{2})([0-9]{2})[A-Z0-9]+\\?");
+    var match = pattern.exec(rawData);
+    
+    //amex - if pattern match fales, it will look for 15 digits instead for american express
+    if (!match) {
+        var pattern = new RegExp("%B([0-9]{15})\\^([A-Z ]+)\/([A-Z ]+)\\^0*([0-9]{2})([0-9]{2})[A-Z0-9]+\\?");
+        var match = pattern.exec(rawData);
+        if (!match) return null;
+    }
+    
+    var cardData = {
+        firstName: $.trim(match[3]),
+        lastName: $.trim(match[2]),
+        cardDateMonth: match[5],
+        cardDateYear: match[4],
+        cardNumber: match[1]
+    };
+    return cardData;
+};
 
-			var cardData = {
-				firstName: $.trim(match[2]),
-				lastName: $.trim(match[1]),
-				idNumber: match[3]
-			};
-			return cardData;
-		};
+// Called on a good scan (company card recognized)
+var goodScan = function (cardData) {
+        try {
+            $("#card-number").val(cardData.cardNumber);
+            $("#card-holdername").val(cardData.firstName + " " + cardData.lastName);
+            $("#card-expiry-year").val("20"+cardData.cardDateYear);
+            $("#card-expiry-month").val( parseInt(cardData.cardDateMonth,10));    
+        } 
+        catch (err) {
+            console.log("input error.", err);
+        }
+    };
 
-		// Called on a good scan (company card recognized)
-		var goodScan = function (cardData) {
-			var text = ['Success!\nFirst name: ', cardData.firstName, '\nLast name: ', cardData.lastName, '\nID number: ', cardData.idNumber].join('');
-			alert(text);
-			};
+// Called on a bad scan (company card not recognized)
+var badScan = function() {
+    console.log("Bad Scan.");
+};
 
-		// Called on a bad scan (company card not recognized)
-		var badScan = function() {
-			alert('Card not recognized.');
-		};
+// Initialize the plugin.
+$.cardswipe({
+    parser: companyCardParser,
+    success: goodScan,
+    error: badScan
+});
 
-		// Initialize the plugin.
-		$.cardswipe({
-			parser: companyCardParser,
-			success: goodScan,
-			error: badScan
-		});
+	</script>
 
-		</script>
-
-
+	<input id="card-number"><br />
+	<input id="card-holder-name"><br />
+	<input id="card-expiry-year"><br />
+	<input id="card-expiry-month"><br />
 
